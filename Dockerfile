@@ -1,4 +1,4 @@
-FROM openjdk:8-jre-slim
+FROM openjdk:17
 WORKDIR /facens_learn
 COPY target/*.jar /facens_learn/facens_learn-0.0.1-SNAPSHOT.jar
 EXPOSE 9090
