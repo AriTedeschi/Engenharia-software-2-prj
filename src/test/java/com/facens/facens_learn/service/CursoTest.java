@@ -33,8 +33,8 @@ class CursoTest {
 		aluno = new AlunoFactory("Rafael")
 		        .comEmail("rafa@gmail.com")
 		        .comSenha("senha123")
-		        .comTelefone("(15)99999-3333")
-		        .comRA("124400")
+		        .comTelefone("(15) 99999-3333")
+		        .comRA("1244000")
 		        .criar();
 		aluno.setNome("Rafael");
 		
