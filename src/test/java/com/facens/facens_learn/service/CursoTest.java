@@ -1,9 +1,16 @@
 package com.facens.facens_learn.service;
+import com.facens.facens_learn.controller.DTO.QuestionarioRespostaDTO;
+import com.facens.facens_learn.factory.AlunoFactory;
+import com.facens.facens_learn.factory.CursoFactory;
+import com.facens.facens_learn.factory.QuestionarioFactory;
 import com.facens.facens_learn.model.*;
+import com.facens.facens_learn.model.VO.Questionario.Alternativa;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,20 +26,39 @@ class CursoTest {
 	private Curso curso;
 	private Inscricao inscricao;
 	private Questionario questionario ;
+	private List<Alternativa> alternativas = new ArrayList<>();
 	
 	@BeforeEach
 	public void setup() {
-		aluno = new Aluno();
+		aluno = new AlunoFactory("Rafael")
+		        .comEmail("rafa@gmail.com")
+		        .comSenha("senha123")
+		        .comTelefone("(15)99999-3333")
+		        .comRA("124400")
+		        .criar();
 		aluno.setNome("Rafael");
 		
-	    curso= new Curso();
-	    curso.addQuestao(new Questao("A", 2.5))
-		.addQuestao(new Questao("A", 2.5))
-		.addQuestao(new Questao("A", 2.5))
-		.addQuestao(new Questao("A", 2.5)); 
+		alternativas.add(new Alternativa("", "A"));
+		alternativas.add(new Alternativa("", "B"));
+		alternativas.add(new Alternativa("", "C"));
+		alternativas.add(new Alternativa("", "D"));
+	    
+		questionario = new QuestionarioFactory()
+	        .comQuestao("Pergunta 1", "A", 2.5,alternativas)
+	        .comQuestao("Pergunta 2", "A", 2.5,alternativas)
+	        .comQuestao("Pergunta 3", "A", 2.5,alternativas)
+	        .comQuestao("Pergunta 4", "A", 2.5,alternativas)
+	        .criar();
+		
+	    curso = new CursoFactory("Curso1")
+	            .comDescricao("Descrição do Curso")
+	            .comDataLancamento(LocalDateTime.now())
+	            .comCargaHoraria(40)
+	            .comCategoria("Categoria do Curso")
+	            .comQuestionario(questionario)
+	            .criar();
 	    
 	    inscricao = new Inscricao(aluno, curso);
-	    questionario = new Questionario(curso, "A","A","A","B");
 	}
 
 	@Test()
@@ -42,27 +68,42 @@ class CursoTest {
 	    
 	    List<Curso> cursosDepois = new ArrayList<>();
 	    cursosDepois.add(curso);
-	    cursosDepois.add(new Curso()
-	    		.addQuestao(new Questao("B", 2.5))
-	    		.addQuestao(new Questao("B", 2.5))
-	    		.addQuestao(new Questao("B", 2.5))
-	    		.addQuestao(new Questao("B", 2.5)));
-	    cursosDepois.add(new Curso()
-	    		.addQuestao(new Questao("C", 2.5))
-	    		.addQuestao(new Questao("C", 2.5))
-	    		.addQuestao(new Questao("C", 2.5))
-	    		.addQuestao(new Questao("C", 2.5)));
-	    cursosDepois.add(new Curso()
-	    		.addQuestao(new Questao("D", 2.5))
-	    		.addQuestao(new Questao("D", 2.5))
-	    		.addQuestao(new Questao("D", 2.5))
-	    		.addQuestao(new Questao("D", 2.5)));
 	    
+	    Curso curso2 = new CursoFactory("Curso2")
+	            .comDescricao("Descrição do Curso")
+	            .comDataLancamento(LocalDateTime.now())
+	            .comCargaHoraria(50)
+	            .comCategoria("Categoria do Curso")
+	            .comQuestionario(questionario)
+	            .criar();
+	    cursosDepois.add(curso2);
+	    
+	    Curso curso3 = new CursoFactory("Curso3")
+	            .comDescricao("Descrição do Curso")
+	            .comDataLancamento(LocalDateTime.now())
+	            .comCargaHoraria(50)
+	            .comCategoria("Categoria do Curso")
+	            .comQuestionario(questionario)
+	            .criar();
+	    cursosDepois.add(curso3);
+	    
+	    Curso curso4 = new CursoFactory("Curso4")
+	            .comDescricao("Descrição do Curso")
+	            .comDataLancamento(LocalDateTime.now())
+	            .comCargaHoraria(50)
+	            .comCategoria("Categoria do Curso")
+	            .comQuestionario(questionario)
+	            .criar();
+	    cursosDepois.add(curso4);
+	    
+	    when(servico.obterCurso(curso.getId())).thenReturn(curso);
 	    when(servico.obterCursosDisponiveis(aluno)).thenReturn(cursosAntes);
+	    
 	    Integer qtdCursos = servico.obterCursosDisponiveis(aluno).size();
 	    when(servico.obterCursosDisponiveis(aluno)).thenReturn(cursosDepois);
 	    
-	    double pontuacao = servico.finalizar(inscricao, questionario);
+	    QuestionarioRespostaDTO resp = new QuestionarioRespostaDTO(null,"A","A","A","B");
+	    double pontuacao = servico.finalizar(inscricao, resp);
 	    
 	    assertTrue(	pontuacao > 7 && 
 	    			(qtdCursos + 3) == servico.obterCursosDisponiveis(aluno).size()
@@ -72,14 +113,15 @@ class CursoTest {
 	@Test()
     public void naoDeveLiberarNovoCursoPorComprovarMediaAbaixoDe7() {
 		
-		questionario = new Questionario(curso, "A","A","B","B");
-		 List<Curso> cursosAntes = new ArrayList<>();
+		List<Curso> cursosAntes = new ArrayList<>();
 		    cursosAntes.add(curso);
-		
+
+		when(servico.obterCurso(curso.getId())).thenReturn(curso);
 		when(servico.obterCursosDisponiveis(aluno)).thenReturn(cursosAntes); 
 	    Integer qtdCursos = servico.obterCursosDisponiveis(aluno).size();
 	    
-	    double pontuacao = servico.finalizar(inscricao, questionario);
+	    QuestionarioRespostaDTO resp = new QuestionarioRespostaDTO(null,"A","A","B","B");
+	    double pontuacao = servico.finalizar(inscricao, resp);
 	    
 	    assertTrue(	pontuacao < 7 && 
 	    			qtdCursos == 1
@@ -88,8 +130,10 @@ class CursoTest {
 	
 	@Test()
     public void naoDeveLiberarNovoCursoEnquantoEstiverCursosPendentes() {
-		    
-	    double pontuacao = servico.finalizar(inscricao, questionario);
+
+		when(servico.obterCurso(curso.getId())).thenReturn(curso);
+		QuestionarioRespostaDTO resp = new QuestionarioRespostaDTO(null,"A","A","A","B");
+	    double pontuacao = servico.finalizar(inscricao, resp);
 		List<Curso> cursos = new ArrayList<>();
 		cursos.add(curso);
 
@@ -103,13 +147,19 @@ class CursoTest {
 	
 	@Test()
     public void deveListarCursosPendentesDoAluno() {
+
+		when(servico.obterCurso(curso.getId())).thenReturn(curso);
 		List<Curso> cursos = new ArrayList<>();
 		cursos.add(curso);
-		cursos.add(new Curso()
-	    		.addQuestao(new Questao("B", 2.5))
-	    		.addQuestao(new Questao("B", 2.5))
-	    		.addQuestao(new Questao("B", 2.5))
-	    		.addQuestao(new Questao("B", 2.5)));
+	    
+	    Curso curso2 = new CursoFactory("Curso2")
+	            .comDescricao("Descrição do Curso")
+	            .comDataLancamento(LocalDateTime.now())
+	            .comCargaHoraria(50)
+	            .comCategoria("Categoria do Curso")
+	            .comQuestionario(questionario)
+	            .criar();
+	    cursos.add(curso2);
 
 		when(servico.obterCursosDisponiveis(aluno)).thenReturn(cursos); 
 	    Integer qtdCursos = servico.obterCursosDisponiveis(aluno).size();
