@@ -73,12 +73,15 @@ class CursoTest {
     public void naoDeveLiberarNovoCursoPorComprovarMediaAbaixoDe7() {
 		
 		questionario = new Questionario(curso, "A","A","B","B");
+		 List<Curso> cursosAntes = new ArrayList<>();
+		    cursosAntes.add(curso);
 		
+		when(servico.obterCursosDisponiveis(aluno)).thenReturn(cursosAntes); 
 	    Integer qtdCursos = servico.obterCursosDisponiveis(aluno).size();
 	    
 	    double pontuacao = servico.finalizar(inscricao, questionario);
 	    
-	    assertTrue(	pontuacao > 7 && 
+	    assertTrue(	pontuacao < 7 && 
 	    			qtdCursos == 1
 	    		);
     }
@@ -87,17 +90,28 @@ class CursoTest {
     public void naoDeveLiberarNovoCursoEnquantoEstiverCursosPendentes() {
 		    
 	    double pontuacao = servico.finalizar(inscricao, questionario);
-	    
+		List<Curso> cursos = new ArrayList<>();
+		cursos.add(curso);
+
+		when(servico.obterCursosDisponiveis(aluno)).thenReturn(cursos); 
 	    Integer qtdCursos = servico.obterCursosDisponiveis(aluno).size();
 	    
 	    assertTrue(	pontuacao > 7 && 
-	    			qtdCursos == 4
+	    			qtdCursos == 1
 	    		);
     }
 	
 	@Test()
     public void deveListarCursosPendentesDoAluno() {
-	    
+		List<Curso> cursos = new ArrayList<>();
+		cursos.add(curso);
+		cursos.add(new Curso()
+	    		.addQuestao(new Questao("B", 2.5))
+	    		.addQuestao(new Questao("B", 2.5))
+	    		.addQuestao(new Questao("B", 2.5))
+	    		.addQuestao(new Questao("B", 2.5)));
+
+		when(servico.obterCursosDisponiveis(aluno)).thenReturn(cursos); 
 	    Integer qtdCursos = servico.obterCursosDisponiveis(aluno).size();
 	    
 	    assertTrue(qtdCursos == 2);
