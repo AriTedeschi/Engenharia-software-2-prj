@@ -1,5 +1,7 @@
 package com.facens.facens_learn.service;
+import com.facens.facens_learn.controller.DTO.CursoDTO;
 import com.facens.facens_learn.controller.DTO.QuestionarioRespostaDTO;
+import com.facens.facens_learn.controller.forms.NovoCursoForm;
 import com.facens.facens_learn.factory.AlunoFactory;
 import com.facens.facens_learn.factory.CursoFactory;
 import com.facens.facens_learn.factory.QuestionarioFactory;
@@ -196,5 +198,43 @@ public class CursoTest {
 	    
 	    assertTrue(qtdCursos == 2);
     }
+	
+	@Test
+	public void deveRegistrarNovoCurso() {
+		NovoCursoForm dto = new NovoCursoForm();
+		dto.setNome(curso.getNome());
+		dto.setCategoria(curso.getCategocia().getCategoria());
+		dto.setDescricao(curso.getDescricao());
+		dto.setDataLancamento(curso.getDataLancamento());
+		dto.setCargaHoraria(curso.getCargaHoraria().getCargaHoraria());
+		
+		when(repository.save(any())).thenReturn(curso);
+		
+		CursoDTO c = servico.inserir(dto);
+		assertTrue(c.getId() == curso.getId());
+	}
+	
+	@Test
+	public void deveObterCursoPorId() throws Exception {
+	    when(repository.findById(any())).thenReturn(Optional.of(curso));
+		CursoDTO c = servico.obterCursoPorId(curso.getId());
+		assertTrue(c.getId() == curso.getId());
+	}
+	
+	@Test(expected = Exception.class)
+	public void naoDeveRetornarCurso() throws Exception{
+		when(repository.findById(any())).thenReturn(Optional.empty());
+	    servico.obterCurso(curso.getId());
+	}
+	
+	@Test 
+	public void deveRetornarCursos() {
+		List<Curso> cursos = new ArrayList<>();
+		cursos.add(curso);
+		when(repository.findAll()).thenReturn(cursos);
+		
+		List<CursoDTO> resultado = servico.obterTodos();
 
+		assertTrue(resultado.size() == cursos.size());		
+	}
 }

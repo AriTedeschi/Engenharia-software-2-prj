@@ -24,7 +24,8 @@ public class QuestionarioFactory {
 
     public Questionario criar() {
         Questionario questionario = new Questionario();
-        questionario.setQuestoes(this.questoes);
+        for(Questao q : questoes)
+        	questionario.adicionarQuestao(q);
         return questionario;
     }
 }

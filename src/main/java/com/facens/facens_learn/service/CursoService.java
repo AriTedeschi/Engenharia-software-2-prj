@@ -78,6 +78,7 @@ public class CursoService {
 		novoCurso.setDataLancamento(dto.getDataLancamento());
 		novoCurso.adicionarCategoria(dto.getCategoria());
 		novoCurso.adicionarCargaHoraria(dto.getCargaHoraria());
+		novoCurso.setQuestionario(new Questionario());
 		
 		novoCurso = repository.save(novoCurso);
 		return new CursoDTO(novoCurso);

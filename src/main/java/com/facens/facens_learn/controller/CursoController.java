@@ -17,8 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.facens.facens_learn.controller.DTO.CursoDTO;
+import com.facens.facens_learn.controller.DTO.QuestionarioDTO;
+import com.facens.facens_learn.controller.forms.NovaQuestaoForm;
 import com.facens.facens_learn.controller.forms.NovoCursoForm;
 import com.facens.facens_learn.service.CursoService;
+import com.facens.facens_learn.service.QuestionarioService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,6 +35,7 @@ import io.swagger.annotations.ApiResponses;
 @RequestMapping("/cursos")
 public class CursoController {
 	@Autowired private CursoService service;
+	@Autowired private QuestionarioService questionarioService;
 	
 	@ApiOperation(value = "Registrar novo Curso", notes = "Endpoint publico")
 	@ApiResponses(value = {
@@ -83,6 +87,27 @@ public class CursoController {
 		List<CursoDTO> clients = service.obterTodos();
 
 		return ResponseEntity.ok().body(clients);
+	}
+	
+	@ApiOperation(value = "Buscar curso por id")
+	@ApiResponses(value = {
+	    @ApiResponse(code = 200, message = "Returns Curso by provided id"),
+	    @ApiResponse(code = 404, message = "There is no Curso with informed id"),
+	    @ApiResponse(code = 403, message = "Invalid Authentication Token"),
+	    @ApiResponse(code = 405, message = "Token can't access resource"),
+	    @ApiResponse(code = 500, message = "Server-side Exception"),
+	})
+	@GetMapping("/{id}/addQuestao")
+	public ResponseEntity<QuestionarioDTO> addQuestao(
+			@Valid @RequestBody NovaQuestaoForm dto,
+			@ApiParam(value="ID do Curso") @PathVariable Long id) {
+		try {
+			QuestionarioDTO questionario = questionarioService.inserirQuestao(dto, id);
+
+			return ResponseEntity.ok().body(questionario);
+		} catch (Exception ex) {
+			return ResponseEntity.badRequest().build();
+		}
 	}
 
 }

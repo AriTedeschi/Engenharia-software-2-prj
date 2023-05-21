@@ -40,7 +40,7 @@ public class Questionario implements Serializable {
 	public List<Questao> getQuestoes() {
 		return questoes;
 	}
-	public void setQuestoes(List<Questao> questoes) {
-		this.questoes = questoes;
+	public void adicionarQuestao(Questao questao) {
+		this.questoes.add(questao);
 	}	
 }
