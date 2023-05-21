@@ -3,12 +3,12 @@ package com.facens.facens_learn.factory;
 import com.facens.facens_learn.model.Curso;
 import com.facens.facens_learn.model.Questionario;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class CursoFactory {
     private String nome;
     private String descricao;
-    private LocalDateTime dataLancamento;
+    private LocalDate dataLancamento;
     private Integer cargaHoraria;
     private String categoria;
     private Questionario questionario;
@@ -22,7 +22,7 @@ public class CursoFactory {
         return this;
     }
 
-    public CursoFactory comDataLancamento(LocalDateTime dataLancamento) {
+    public CursoFactory comDataLancamento(LocalDate dataLancamento) {
         this.dataLancamento = dataLancamento;
         return this;
     }
@@ -46,7 +46,7 @@ public class CursoFactory {
         Curso curso = new Curso(this.nome);
         curso.setDescricao(this.descricao);
         curso.setDataLancamento(this.dataLancamento);
-        curso.setCargaHoraria(this.cargaHoraria);
+        curso.adicionarCargaHoraria(this.cargaHoraria);
         curso.adicionarCategoria(this.categoria);
         curso.setQuestionario(this.questionario);
         return curso;

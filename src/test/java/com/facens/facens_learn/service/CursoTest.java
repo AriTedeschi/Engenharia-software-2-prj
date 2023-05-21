@@ -4,23 +4,52 @@ import com.facens.facens_learn.factory.AlunoFactory;
 import com.facens.facens_learn.factory.CursoFactory;
 import com.facens.facens_learn.factory.QuestionarioFactory;
 import com.facens.facens_learn.model.*;
-import com.facens.facens_learn.model.VO.Questionario.Alternativa;
+import com.facens.facens_learn.repository.CursoRepository;
+import com.facens.facens_learn.repository.InscricaoRepository;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mockitoSession;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.junit4.SpringRunner;
 
 
-class CursoTest {
+@RunWith(SpringRunner.class)
+public class CursoTest {
 	
-	private final CursoService servico = spy(CursoService.class);
+	@TestConfiguration
+	static class CursoServiceTestConfiguration{
+		@Bean
+		public CursoService cursoService() {
+			return new CursoService();
+		}
+	}
+	
+	@Autowired
+	private CursoService servico;
+
+    @MockBean
+	private CursoRepository repository;
+    
+    @MockBean
+    private InscricaoRepository inscricaoRepository;
 	
 	private Aluno aluno;
 	private Curso curso;
@@ -28,8 +57,9 @@ class CursoTest {
 	private Questionario questionario ;
 	private List<Alternativa> alternativas = new ArrayList<>();
 	
-	@BeforeEach
-	public void setup() {
+	@Before
+	public void setup() throws Exception {
+        MockitoAnnotations.initMocks(this);
 		aluno = new AlunoFactory("Rafael")
 		        .comEmail("rafa@gmail.com")
 		        .comSenha("senha123")
@@ -37,6 +67,9 @@ class CursoTest {
 		        .comRA("1244000")
 		        .criar();
 		aluno.setNome("Rafael");
+		
+		this.servico.setInscricaoRepository(inscricaoRepository);
+		this.servico.setRepository(repository);
 		
 		alternativas.add(new Alternativa("", "A"));
 		alternativas.add(new Alternativa("", "B"));
@@ -52,17 +85,19 @@ class CursoTest {
 		
 	    curso = new CursoFactory("Curso1")
 	            .comDescricao("Descrição do Curso")
-	            .comDataLancamento(LocalDateTime.now())
+	            .comDataLancamento(LocalDate.now())
 	            .comCargaHoraria(40)
 	            .comCategoria("Categoria do Curso")
 	            .comQuestionario(questionario)
 	            .criar();
 	    
 	    inscricao = new Inscricao(aluno, curso);
+
+	    when(repository.findById(any())).thenReturn(Optional.of(curso));
 	}
 
 	@Test()
-    public void deveLiberarNovoCursoPorComprovarMediaAcimaDe7() {
+    public void deveLiberarNovoCursoPorComprovarMediaAcimaDe7() throws Exception {
 	    List<Curso> cursosAntes = new ArrayList<>();
 	    cursosAntes.add(curso);
 	    
@@ -71,7 +106,7 @@ class CursoTest {
 	    
 	    Curso curso2 = new CursoFactory("Curso2")
 	            .comDescricao("Descrição do Curso")
-	            .comDataLancamento(LocalDateTime.now())
+	            .comDataLancamento(LocalDate.now())
 	            .comCargaHoraria(50)
 	            .comCategoria("Categoria do Curso")
 	            .comQuestionario(questionario)
@@ -80,7 +115,7 @@ class CursoTest {
 	    
 	    Curso curso3 = new CursoFactory("Curso3")
 	            .comDescricao("Descrição do Curso")
-	            .comDataLancamento(LocalDateTime.now())
+	            .comDataLancamento(LocalDate.now())
 	            .comCargaHoraria(50)
 	            .comCategoria("Categoria do Curso")
 	            .comQuestionario(questionario)
@@ -89,16 +124,14 @@ class CursoTest {
 	    
 	    Curso curso4 = new CursoFactory("Curso4")
 	            .comDescricao("Descrição do Curso")
-	            .comDataLancamento(LocalDateTime.now())
+	            .comDataLancamento(LocalDate.now())
 	            .comCargaHoraria(50)
 	            .comCategoria("Categoria do Curso")
 	            .comQuestionario(questionario)
 	            .criar();
 	    cursosDepois.add(curso4);
 	    
-	    when(servico.obterCurso(curso.getId())).thenReturn(curso);
-	    when(servico.obterCursosDisponiveis(aluno)).thenReturn(cursosAntes);
-	    
+	    when(servico.obterCursosDisponiveis(aluno)).thenReturn(cursosAntes);	    
 	    Integer qtdCursos = servico.obterCursosDisponiveis(aluno).size();
 	    when(servico.obterCursosDisponiveis(aluno)).thenReturn(cursosDepois);
 	    
@@ -111,13 +144,12 @@ class CursoTest {
     }
 	
 	@Test()
-    public void naoDeveLiberarNovoCursoPorComprovarMediaAbaixoDe7() {
+    public void naoDeveLiberarNovoCursoPorComprovarMediaAbaixoDe7() throws Exception {
 		
 		List<Curso> cursosAntes = new ArrayList<>();
 		    cursosAntes.add(curso);
 
-		when(servico.obterCurso(curso.getId())).thenReturn(curso);
-		when(servico.obterCursosDisponiveis(aluno)).thenReturn(cursosAntes); 
+		when(servico.obterCursosDisponiveis(aluno)).thenReturn(cursosAntes);
 	    Integer qtdCursos = servico.obterCursosDisponiveis(aluno).size();
 	    
 	    QuestionarioRespostaDTO resp = new QuestionarioRespostaDTO(null,"A","A","B","B");
@@ -129,9 +161,8 @@ class CursoTest {
     }
 	
 	@Test()
-    public void naoDeveLiberarNovoCursoEnquantoEstiverCursosPendentes() {
+    public void naoDeveLiberarNovoCursoEnquantoEstiverCursosPendentes() throws Exception {
 
-		when(servico.obterCurso(curso.getId())).thenReturn(curso);
 		QuestionarioRespostaDTO resp = new QuestionarioRespostaDTO(null,"A","A","A","B");
 	    double pontuacao = servico.finalizar(inscricao, resp);
 		List<Curso> cursos = new ArrayList<>();
@@ -146,15 +177,14 @@ class CursoTest {
     }
 	
 	@Test()
-    public void deveListarCursosPendentesDoAluno() {
+    public void deveListarCursosPendentesDoAluno() throws Exception{
 
-		when(servico.obterCurso(curso.getId())).thenReturn(curso);
 		List<Curso> cursos = new ArrayList<>();
 		cursos.add(curso);
 	    
 	    Curso curso2 = new CursoFactory("Curso2")
 	            .comDescricao("Descrição do Curso")
-	            .comDataLancamento(LocalDateTime.now())
+	            .comDataLancamento(LocalDate.now())
 	            .comCargaHoraria(50)
 	            .comCategoria("Categoria do Curso")
 	            .comQuestionario(questionario)

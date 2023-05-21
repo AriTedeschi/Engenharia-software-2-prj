@@ -3,14 +3,26 @@ package com.facens.facens_learn.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.facens.facens_learn.model.VO.Questionario.Alternativa;
+import javax.persistence.*;
 
+@Entity
+@Table(name = "questao")
 public class Questao {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 	private String pergunta;
 	private String resposta;
 	private double peso;
-	private List<Alternativa> alternativas = new ArrayList<>();
 	
+	@ManyToOne
+    @JoinColumn(name ="questionario_id")
+    private Questionario questionario;
+	
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "questao_id")
+	private List<Alternativa> alternativas = new ArrayList<>();
+	public Questao() {}
 	public Questao(String pergunta,String resposta,double peso) {
 		this.pergunta=pergunta;
 		this.resposta=resposta;
@@ -44,4 +56,21 @@ public class Questao {
 	public List<Alternativa> getAlternativas() {
 		return alternativas;
 	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Questionario getQuestionario() {
+		return questionario;
+	}
+
+	public void setQuestionario(Questionario questionario) {
+		this.questionario = questionario;
+	}
+	
 }

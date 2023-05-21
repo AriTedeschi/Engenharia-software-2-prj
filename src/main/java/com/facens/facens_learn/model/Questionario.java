@@ -1,21 +1,27 @@
 package com.facens.facens_learn.model;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+
 import java.util.List;
 
-public class Questionario {
+import javax.persistence.*;
+
+import com.facens.facens_learn.model.VO.Questionario.Nota;
+
+@Entity
+public class Questionario implements Serializable {
+	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private List<Questao> questoes;
+	
+	@Embedded
+	private Nota nota;
+	
+	@OneToMany(fetch = FetchType.EAGER, mappedBy="questionario", cascade = CascadeType.PERSIST)
+	private List<Questao> questoes = new ArrayList<>();
 	
 	public Questionario() {}
-	public Questionario(Curso curso, Questao... questoes) {
-		List<Questao> _questoes = new ArrayList<>();
-		
-		for(Questao q : questoes) 
-			_questoes.add(q);			
-		
-		this.questoes=_questoes;
-	}
 	
 	public Long getId() {
 		return id;
@@ -24,6 +30,13 @@ public class Questionario {
 		this.id = id;
 	}
 	
+	public void adicionarNota(BigDecimal nota) {
+		this.nota = new Nota(nota);
+	}
+	
+	public Nota getNota() {
+		return nota;
+	}
 	public List<Questao> getQuestoes() {
 		return questoes;
 	}

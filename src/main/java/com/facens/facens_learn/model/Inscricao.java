@@ -2,11 +2,27 @@ package com.facens.facens_learn.model;
 
 import java.math.BigDecimal;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "inscricao")
 public class Inscricao {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name="aluno_id")
 	private Aluno inscrito;
+
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name="curso_id")
 	private Curso curso;	
+	
 	private BigDecimal pontuacao;
+	
+	private Boolean finalizado;	
 	
 	public Inscricao() {}
 		
@@ -41,5 +57,15 @@ public class Inscricao {
 	public void setPontuacao(BigDecimal pontuacao) {
 		this.pontuacao = pontuacao;
 	}
+
+	public Boolean getFinalizado() {
+		return finalizado;
+	}
+
+	public void setFinalizado(Boolean finalizado) {
+		this.finalizado = finalizado;
+	}
+	
+	
 	
 }

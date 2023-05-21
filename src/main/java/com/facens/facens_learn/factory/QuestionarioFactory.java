@@ -1,9 +1,8 @@
 package com.facens.facens_learn.factory;
 
-import com.facens.facens_learn.model.Curso;
+import com.facens.facens_learn.model.Alternativa;
 import com.facens.facens_learn.model.Questao;
 import com.facens.facens_learn.model.Questionario;
-import com.facens.facens_learn.model.VO.Questionario.Alternativa;
 
 import java.util.ArrayList;
 import java.util.List;

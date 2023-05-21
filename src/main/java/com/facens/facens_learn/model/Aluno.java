@@ -1,15 +1,31 @@
 package com.facens.facens_learn.model;
 
 import com.facens.facens_learn.model.VO.Aluno.Email;
+
 import com.facens.facens_learn.model.VO.Aluno.RA;
 import com.facens.facens_learn.model.VO.Aluno.Telefone;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "aluno")
 public class Aluno {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
+	@Embedded
 	private RA ra;
+	
 	private String nome;
+	
+	@Embedded
 	private Email email;
+	
 	private String senha;
+	
+	@Embedded
 	private Telefone telefone;
 	
 	public Long getId() {

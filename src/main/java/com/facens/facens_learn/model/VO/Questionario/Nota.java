@@ -2,11 +2,14 @@ package com.facens.facens_learn.model.VO.Questionario;
 
 import java.math.BigDecimal;
 
+import javax.persistence.Embeddable;
+
+@Embeddable
 public class Nota {
 	private BigDecimal nota;
 
     public Nota(String nota) {
-        if ( nota != null || 
+        if ( nota != null && 
 				!nota.matches("^(10(\\.0+)?|[0-9](\\.[0-9]+)?)$")) {
             throw new IllegalArgumentException("Nota inválida!");
         }
@@ -15,7 +18,7 @@ public class Nota {
     }
 
     public Nota(BigDecimal nota) {
-        if ( nota != null || 
+        if ( nota != null &&
 				!nota.toString().matches("^(10(\\.0+)?|[0-9](\\.[0-9]+)?)$")) {
             throw new IllegalArgumentException("Nota inválida!");
         }
